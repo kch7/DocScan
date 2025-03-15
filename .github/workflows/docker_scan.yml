@@ -1,0 +1,24 @@
+name: Docker Image Scan
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.0_Linux-64bit.tar.gz
+          tar -xzvf trivy_0.49.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+
+      - name: Scan MinIO Docker Image
+        run: trivy image --format table --exit-code 0 --no-progress minio/minio:latest
